@@ -350,7 +350,10 @@
             const emtrs = currentData.map(d => (d.emtr !== null ? d.emtr * 100 : null));
             const snap = currentData.map(d => d.snap);
             const eitc = currentData.map(d => d.eitc);
+            const state_eitc = currentData.map(d => d.state_eitc || 0);
             const ctc = currentData.map(d => d.ctc);
+            const wic = currentData.map(d => d.wic || 0);
+            const medicaid = currentData.map(d => d.medicaid || 0);
 
             // Net Income Chart
             if (charts.netIncome) charts.netIncome.destroy();
@@ -394,22 +397,29 @@
                         x: {
                             title: {
                                 display: true,
-                                text: 'Employment Income ($)'
+                                text: 'Employment Income'
                             },
                             ticks: {
-                                callback: function(value) {
-                                    return '$' + (value/1000) + 'k';
+                                callback: function(value, index, ticks) {
+                                    const income = incomes[index];
+                                    if (income >= 1000) {
+                                        return '$' + (income/1000) + 'k';
+                                    }
+                                    return '$' + income;
                                 }
                             }
                         },
                         y: {
                             title: {
                                 display: true,
-                                text: 'Net Income ($)'
+                                text: 'Net Income'
                             },
                             ticks: {
                                 callback: function(value) {
-                                    return '$' + (value/1000) + 'k';
+                                    if (value >= 1000) {
+                                        return '$' + (value/1000) + 'k';
+                                    }
+                                    return '$' + value;
                                 }
                             }
                         }
@@ -472,11 +482,15 @@
                         x: {
                             title: {
                                 display: true,
-                                text: 'Employment Income ($)'
+                                text: 'Employment Income'
                             },
                             ticks: {
-                                callback: function(value) {
-                                    return '$' + (value/1000) + 'k';
+                                callback: function(value, index, ticks) {
+                                    const income = incomes[index];
+                                    if (income >= 1000) {
+                                        return '$' + (income/1000) + 'k';
+                                    }
+                                    return '$' + income;
                                 }
                             }
                         },
@@ -485,8 +499,13 @@
                                 display: true,
                                 text: 'EMTR (%)'
                             },
-                            min: -20,
-                            max: 100
+                            min: -50,
+                            suggestedMax: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(0) + '%';
+                                }
+                            }
                         }
                     }
                 }
@@ -507,17 +526,39 @@
                         borderWidth: 2,
                         tension: 0.1
                     }, {
-                        label: 'EITC',
+                        label: 'Federal EITC',
                         data: eitc,
                         borderColor: '#1976D2',
                         backgroundColor: 'rgba(25, 118, 210, 0.1)',
                         borderWidth: 2,
                         tension: 0.1
                     }, {
+                        label: 'State EITC',
+                        data: state_eitc,
+                        borderColor: '#42A5F5',
+                        backgroundColor: 'rgba(66, 165, 245, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.1,
+                        borderDash: [3, 3]
+                    }, {
                         label: 'CTC',
                         data: ctc,
                         borderColor: '#FFCC00',
                         backgroundColor: 'rgba(255, 204, 0, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.1
+                    }, {
+                        label: 'WIC',
+                        data: wic,
+                        borderColor: '#F57C00',
+                        backgroundColor: 'rgba(245, 124, 0, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.1
+                    }, {
+                        label: 'Medicaid',
+                        data: medicaid,
+                        borderColor: '#7B1FA2',
+                        backgroundColor: 'rgba(123, 31, 162, 0.1)',
                         borderWidth: 2,
                         tension: 0.1
                     }]
@@ -534,22 +575,29 @@
                         x: {
                             title: {
                                 display: true,
-                                text: 'Employment Income ($)'
+                                text: 'Employment Income'
                             },
                             ticks: {
-                                callback: function(value) {
-                                    return '$' + (value/1000) + 'k';
+                                callback: function(value, index, ticks) {
+                                    const income = incomes[index];
+                                    if (income >= 1000) {
+                                        return '$' + (income/1000) + 'k';
+                                    }
+                                    return '$' + income;
                                 }
                             }
                         },
                         y: {
                             title: {
                                 display: true,
-                                text: 'Benefit Amount ($)'
+                                text: 'Benefit Amount'
                             },
                             ticks: {
                                 callback: function(value) {
-                                    return '$' + value.toLocaleString();
+                                    if (value >= 1000) {
+                                        return '$' + (value/1000) + 'k';
+                                    }
+                                    return '$' + value;
                                 }
                             }
                         }
