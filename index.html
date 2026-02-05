@@ -487,17 +487,7 @@
                         backgroundColor: 'rgba(153, 0, 0, 0.2)',
                         borderWidth: 3,
                         tension: 0.1,
-                        fill: true,  // Fill area under curve
-                        segment: {
-                            borderColor: ctx => {
-                                const value = ctx.p1.parsed.y;
-                                return value > 50 ? '#cc0000' : '#990000';
-                            },
-                            backgroundColor: ctx => {
-                                const value = ctx.p1.parsed.y;
-                                return value > 50 ? 'rgba(204, 0, 0, 0.2)' : 'rgba(153, 0, 0, 0.1)';
-                            }
-                        }
+                        fill: true  // Fill area under curve with uniform color
                     }]
                 },
                 options: {
@@ -518,6 +508,18 @@
                                     borderDash: [5, 5],
                                     label: {
                                         content: '50% threshold',
+                                        enabled: true,
+                                        position: 'end'
+                                    }
+                                },
+                                line100: {
+                                    type: 'line',
+                                    yMin: 100,
+                                    yMax: 100,
+                                    borderColor: '#FF0000',
+                                    borderWidth: 2,
+                                    label: {
+                                        content: '100%',
                                         enabled: true,
                                         position: 'end'
                                     }
