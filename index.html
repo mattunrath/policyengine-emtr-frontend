@@ -368,7 +368,7 @@
             const emtrs = currentData.map(d => (d.emtr !== null ? d.emtr * 100 : null));
             const snap = currentData.map(d => d.snap || 0);
             const tanf = currentData.map(d => d.tanf || 0);
-            const wic = currentData.map(d => d.wic || 0);
+            // WIC removed from display (always zero in calculations)
             const eitc = currentData.map(d => d.eitc);
             const state_eitc = currentData.map(d => d.state_eitc || 0);
             const ctc = currentData.map(d => d.ctc);
@@ -588,13 +588,6 @@
                         borderWidth: 2,
                         tension: 0.1
                     }, {
-                        label: 'WIC',
-                        data: wic,
-                        borderColor: '#F57C00',
-                        backgroundColor: 'rgba(245, 124, 0, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.1
-                    }, {
                         label: 'Federal EITC',
                         data: eitc,
                         borderColor: '#1976D2',
@@ -675,36 +668,6 @@
             const cliffs = currentData.filter(d => d.emtr !== null && d.emtr > 0.5);
 
             let html = '';
-
-            // Benefit cliffs
-            if (cliffs.length > 0) {
-                html += `<div class="insight-box">
-                    <h3>⚠️ Benefit Cliffs Found: ${cliffs.length} income ranges</h3>
-                    <p>These are income levels where earning an additional $1,000 results in losing more than $500 in net income (EMTR > 50%).</p>
-                    <ul class="cliff-list">`;
-
-                cliffs.slice(0, 5).forEach(point => {
-                    html += `<li class="cliff-item">
-                        At $${point.employment_income.toLocaleString()}:
-                        <span class="cliff-emtr">EMTR = ${(point.emtr * 100).toFixed(1)}%</span>
-                        (Net income: $${point.household_net_income.toLocaleString()})
-                    </li>`;
-                });
-
-                html += `</ul></div>`;
-            }
-
-            // Program phases
-            html += `<div class="insight-box">
-                <h3>📊 Program Interactions</h3>
-                <p>Multiple programs interact to create the effective marginal tax rate:</p>
-                <ul>
-                    <li><strong>SNAP:</strong> Phases out as income rises, creating implicit tax</li>
-                    <li><strong>EITC:</strong> Has phase-in, plateau, and phase-out regions</li>
-                    <li><strong>CTC:</strong> Phases in with earned income, then plateaus</li>
-                    <li><strong>Medicaid:</strong> Cliff eligibility at specific thresholds</li>
-                </ul>
-            </div>`;
 
             // Max EMTR
             const maxEMTR = Math.max(...currentData.filter(d => d.emtr !== null).map(d => d.emtr));
