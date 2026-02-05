@@ -362,7 +362,9 @@
             const incomes = currentData.map(d => d.employment_income);
             const netIncomes = currentData.map(d => d.household_net_income);
             const emtrs = currentData.map(d => (d.emtr !== null ? d.emtr * 100 : null));
+            const snap = currentData.map(d => d.snap || 0);
             const tanf = currentData.map(d => d.tanf || 0);
+            const wic = currentData.map(d => d.wic || 0);
             const eitc = currentData.map(d => d.eitc);
             const state_eitc = currentData.map(d => d.state_eitc || 0);
             const ctc = currentData.map(d => d.ctc);
@@ -532,10 +534,24 @@
                 data: {
                     labels: incomes,
                     datasets: [{
+                        label: 'SNAP',
+                        data: snap,
+                        borderColor: '#2E7D32',
+                        backgroundColor: 'rgba(46, 125, 50, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.1
+                    }, {
                         label: 'TANF',
                         data: tanf,
                         borderColor: '#C62828',
                         backgroundColor: 'rgba(198, 40, 40, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.1
+                    }, {
+                        label: 'WIC',
+                        data: wic,
+                        borderColor: '#F57C00',
+                        backgroundColor: 'rgba(245, 124, 0, 0.1)',
                         borderWidth: 2,
                         tension: 0.1
                     }, {
