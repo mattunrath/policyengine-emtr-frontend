@@ -476,6 +476,12 @@
             // EMTR Chart
             if (charts.emtr) charts.emtr.destroy();
             const emtrCtx = document.getElementById('emtrChart').getContext('2d');
+
+            // Calculate dynamic y-axis minimum
+            const validEmtrs = emtrs.filter(e => e !== null);
+            const minEmtr = validEmtrs.length > 0 ? Math.min(...validEmtrs) : 0;
+            const yAxisMin = Math.min(-100, Math.floor(minEmtr / 10) * 10);
+
             charts.emtr = new Chart(emtrCtx, {
                 type: 'line',
                 data: {
@@ -548,7 +554,7 @@
                                 display: true,
                                 text: 'EMTR (%)'
                             },
-                            min: -50,
+                            min: yAxisMin,
                             suggestedMax: 100,
                             ticks: {
                                 callback: function(value) {
