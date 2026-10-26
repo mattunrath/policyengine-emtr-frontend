@@ -1,0 +1,17 @@
+{
+  "tax_year": 2025,
+  "policyengine_us_version": "2.63.3",
+  "generated_utc": "2026-10-26T00:28:13+00:00",
+  "income_min": 0,
+  "income_max": 100000,
+  "income_step": 2000,
+  "medicaid_value_per_person": 5000.0,
+  "child_ages": [
+    5,
+    7,
+    9,
+    11
+  ],
+  "payroll_tax_included": false,
+  "net_income": "earnings + snap + tanf + wic + medicaid - income_tax - state_income_tax (taxes are net of refundable credits incl. EITC and CTC)"
+}

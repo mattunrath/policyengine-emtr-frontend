@@ -219,6 +219,13 @@
         <div class="controls">
             <div class="control-group">
                 <div class="control-item">
+                    <label for="year">Tax Year</label>
+                    <select id="year">
+                        <option value="2025" selected>2025</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
                     <label for="state">State</label>
                     <select id="state">
                         <option value="">Loading states...</option>
@@ -279,6 +286,18 @@
                 <h2>Key Findings</h2>
                 <div id="insightsContent"></div>
             </div>
+
+            <div class="insights" id="methodNote" style="font-size: 0.9rem;">
+                <h2>How these numbers are computed</h2>
+                <p>Household: one parent (age 35) with the selected number of children (ages 5, 7, 9, 11).
+                Net income = earnings + SNAP + TANF + Medicaid value &minus; federal income tax &minus; state income tax.
+                Federal and state income taxes are net of refundable credits, so the EITC, state EITC and CTC
+                are already inside the tax lines; they are plotted separately only for illustration.
+                Medicaid is valued at a flat $5,000 per household member when the parent is eligible.
+                Payroll taxes are not included. The EMTR is the share of each additional $2,000 of earnings
+                lost to higher taxes and lower benefits.</p>
+                <p id="dataVersion"></p>
+            </div>
         </div>
     </div>
 
@@ -289,6 +308,25 @@
             emtr: null,
             benefits: null
         };
+
+        // Load tax years from static JSON
+        async function loadYears() {
+            try {
+                const response = await fetch('data/years.json');
+                const years = await response.json();
+                const select = document.getElementById('year');
+                select.innerHTML = '';
+                years.forEach(y => {
+                    const option = document.createElement('option');
+                    option.value = y;
+                    option.textContent = y;
+                    select.appendChild(option);
+                });
+                select.value = String(Math.max(...years));  // default to the latest year
+            } catch (error) {
+                console.error('Failed to load years:', error);
+            }
+        }
 
         // Load states from static JSON
         async function loadStates() {
@@ -311,12 +349,14 @@
         }
 
         // Load states when page loads
+        loadYears();
         loadStates();
 
         document.getElementById('calculateBtn').addEventListener('click', calculateProfile);
         document.getElementById('exportBtn').addEventListener('click', exportData);
 
         async function calculateProfile() {
+            const year = document.getElementById('year').value;
             const state = document.getElementById('state').value;
             const children = parseInt(document.getElementById('children').value);
             const includeMedicaid = document.getElementById('includeMedicaid').checked;
@@ -330,7 +370,7 @@
 
             try {
                 const medStr = includeMedicaid ? 'true' : 'false';
-                const dataFile = `data/${state}_${children}_${medStr}.json`;
+                const dataFile = `data/${year}/${state}_${children}_${medStr}.json`;
                 const response = await fetch(dataFile);
 
                 if (!response.ok) {
@@ -339,6 +379,13 @@
 
                 currentData = await response.json();
                 displayResults();
+                try {
+                    const meta = await (await fetch(`data/${year}/meta.json`)).json();
+                    document.getElementById('dataVersion').textContent =
+                        `Tax year ${meta.tax_year}. Computed with PolicyEngine US ${meta.policyengine_us_version} on ${meta.generated_utc.slice(0, 10)}.`;
+                } catch (e) {
+                    document.getElementById('dataVersion').textContent = '';
+                }
 
             } catch (error) {
                 document.getElementById('error').style.display = 'block';
@@ -682,12 +729,13 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `policyengine_data_${document.getElementById('state').value}_${document.getElementById('children').value}kids.csv`;
+            a.download = `policyengine_data_${document.getElementById('year').value}_${document.getElementById('state').value}_${document.getElementById('children').value}kids.csv`;
             a.click();
         }
 
         function convertToCSV(data) {
-            const headers = ['employment_income', 'household_net_income', 'emtr', 'snap', 'eitc', 'ctc', 'income_tax', 'payroll_tax'];
+            const headers = ['employment_income', 'household_net_income', 'emtr', 'snap', 'tanf', 'eitc', 'state_eitc',
+                             'ctc', 'ctc_refundable', 'ctc_nonrefundable', 'medicaid', 'income_tax', 'state_income_tax'];
             let csv = headers.join(',') + '\n';
 
             data.forEach(row => {
